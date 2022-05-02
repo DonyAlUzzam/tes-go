@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func ConnectDB() {
 	USER := "root"
-	PASS := "050617Islam"
+	PASS := ""
 	HOST := "localhost"
 	PORT := "3306"
 	DBNAME := "tes-go"
