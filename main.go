@@ -7,6 +7,7 @@ import (
 	"myapp/auth"
 	"myapp/config"
 	"myapp/model"
+	"myapp/src"
 	"myapp/utils"
 	"net/http"
 	"os"
@@ -62,7 +63,7 @@ func CreateUser(c echo.Context) error {
 func UpdateUser(c echo.Context) error {
 	user := new(model.Users)
 	c.Bind(user)
-	response := new(Response)
+	response := new(utils.Response)
 	if user.UpdateUser(c.Param("email")) != nil {
 		response.ErrorCode = 10
 		response.Message = "Gagal updatre user"
@@ -76,7 +77,7 @@ func UpdateUser(c echo.Context) error {
 
 func DeleteUser(c echo.Context) error {
 	user, _ := model.GetOneByEmail(c.Param("email"))
-	response := new(Response)
+	response := new(utils.Response)
 
 	if user.DeleteUser() != nil {
 		response.ErrorCode = 10
@@ -89,7 +90,7 @@ func DeleteUser(c echo.Context) error {
 }
 
 func GetUserAll(c echo.Context) error {
-	response := new(Response)
+	response := new(utils.Response)
 	users, err := model.GetAll(c.QueryParam("keywords"))
 
 	if err != nil {
@@ -104,7 +105,7 @@ func GetUserAll(c echo.Context) error {
 }
 
 func GetUserByEmail(c echo.Context) error {
-	response := new(Response)
+	response := new(utils.Response)
 	user, err := model.GetOneByEmail(c.Param("email"))
 	if err != nil {
 		response.ErrorCode = 10
@@ -119,7 +120,7 @@ func GetUserByEmail(c echo.Context) error {
 }
 
 func Login(c echo.Context) error {
-	response := new(ResponseLogin)
+	response := new(utils.ResponseLogin)
 	form := auth.LoginRequest{}
 	c.Bind(&form)
 
@@ -140,32 +141,36 @@ func Login(c echo.Context) error {
 }
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("./config/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	config.ConnectDB()
-	config.ConnectSolr()
-	route := echo.New()
-	v1 := route.Group("api/v1/users")
-	{
-		v1.POST("/", CreateUser)
-		v1.POST("/login", Login)
-		v1.PATCH("/:email", UpdateUser)
-		v1.GET("/", GetUserAll, auth.JWTVerify)
-		v1.GET("/:email", GetUserByEmail)
-		v1.DELETE("/:email", DeleteUser)
-	}
+	cfg := config.NewConfig()
 
-	v2 := route.Group("api/v2/users")
-	{
-		v2.POST("/", CreateUser)
-		v2.PATCH("/:email", UpdateUser)
-		v2.GET("/", GetUserAll)
-		v2.GET("/:email", GetUserByEmail)
-		v2.DELETE("/:email", DeleteUser)
-	}
+	src.Run(cfg)
 
-	route.Start(":8000")
+	// config.ConnectDB()
+	// config.ConnectSolr()
+	// route := echo.New()
+	// v1 := route.Group("api/v1/users")
+	// {
+	// 	v1.POST("/", CreateUser)
+	// 	v1.POST("/login", Login)
+	// 	v1.PATCH("/:email", UpdateUser)
+	// 	v1.GET("/", GetUserAll, auth.JWTVerify)
+	// 	v1.GET("/:email", GetUserByEmail)
+	// 	v1.DELETE("/:email", DeleteUser)
+	// }
+
+	// v2 := route.Group("api/v2/users")
+	// {
+	// 	v2.POST("/", CreateUser)
+	// 	v2.PATCH("/:email", UpdateUser)
+	// 	v2.GET("/", GetUserAll)
+	// 	v2.GET("/:email", GetUserByEmail)
+	// 	v2.DELETE("/:email", DeleteUser)
+	// }
+
+	// route.Start(":8000")
 }
