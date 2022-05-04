@@ -18,6 +18,7 @@ func Run(cfg config.Config) {
 	us := usecase.NewUsecase(cfg)
 
 	userDelivery := v1.NewUserDelivery(us.User())
+	// userGroup := echoServer.Group(os.Getenv("SERVICE_NAME")+`/v1/user`, middleware.JWTVerify)
 	userGroup := echoServer.Group(os.Getenv("SERVICE_NAME") + `/v1/user`)
 	userDelivery.Mount(userGroup)
 

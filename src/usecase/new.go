@@ -24,6 +24,3 @@ func (c *UsecaseContext) User() UserUsecase {
 	repo := repository.NewRepository()
 	return NewUserUsecase(repo.User(c.cfg))
 }
-
-func (c *UsecaseContext) Order() {
-}

@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	"net/http"
@@ -16,6 +16,11 @@ type Claims struct {
 	Nama  string `json:"name"`
 	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
 var (
